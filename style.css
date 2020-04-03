@@ -1,0 +1,19 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    max-width: 1366px;
+}
+#screenRender{
+    display: block;
+    margin: 0 auto;
+    width: 80%;
+    background-color: #fff;
+    border: 2px solid #dcdcdc;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    image-rendering: -moz-crisp-edges;
+    
+}

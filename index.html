@@ -1,0 +1,33 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Coffe in sugar</title>
+        <link rel="stylesheet" href="./style.css">
+    </head>
+
+    <body>
+        
+        <h1 style="text-align: center; margin-top: 25px;">Coffee in sugar</h1>
+        <h2 id="fps" style="text-align: center; margin-top: 25px;"></h2>
+        <canvas id="screenRender" width="640" height="260">
+            Canvas requires a browser that supports HTML5.
+        </canvas>
+    </body>
+    <script src="./GameObjects.js"></script>
+    <script src="./GameSetup.js"></script>
+    <script src="./ObjectsSetup.js"></script>
+    <script > 
+
+        window.onload = init 
+        
+        
+        function init () {
+            console.clear()
+            return game = new GameSetup('screenRender');
+        }
+
+     
+
+    </script>
+</html>
