@@ -4,6 +4,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Coffe in sugar</title>
         <link rel="stylesheet" href="./style.css">
+        <script src="/socket.io/socket.io.js"></script>
     </head>
 
     <body>
@@ -13,19 +14,31 @@
         <canvas id="screenRender" width="640" height="260">
             Canvas requires a browser that supports HTML5.
         </canvas>
+        <table id="points" >
+            <tr>
+                <th>Nome</th>
+                <th>Pontos</th>
+            </tr>
+        </table>
     </body>
     <script src="./GameObjects.js"></script>
     <script src="./GameSetup.js"></script>
     <script src="./ObjectsSetup.js"></script>
     <script > 
-
+        var socket = io();
         window.onload = init 
         
         
         function init () {
-            console.clear()
-            return game = new GameSetup('screenRender');
+            console.clear();
+               socket.on('first-add-player', (player) => {
+                game = new GameSetup('screenRender', player.id);
+                game.addPlayer(player);
+            })
+
+            setInterval(()=>game.addSugarRandom(), 2000);
         }
+
 
      
 

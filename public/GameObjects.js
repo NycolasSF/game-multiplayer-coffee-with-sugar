@@ -1,5 +1,6 @@
-class PlayersObject {
+class PlayerObject {
     constructor(player, canvasId){
+        
         this.id = player.id;
         this.name = player.name; 
         this.posX = player.position.x;
@@ -9,6 +10,8 @@ class PlayersObject {
         
         this.context = null;
         this.screen = {};
+
+        this.score = 0;
         
         this.setAttributes(canvasId);
     }

@@ -1,6 +1,5 @@
-class Players extends PlayersObject{
+class Player extends PlayerObject{
     constructor(players, canvasID){
-        
         //View GameObjets.js
         super(players, canvasID);
 
@@ -11,43 +10,33 @@ class Players extends PlayersObject{
         }
 
         this.speed = 256;
+
+        this.globalID = undefined;
+        this.getElements();
+    }
+    getElements(){
+        this.globalID = localStorage.getItem('globalID');
     }
     
     draw(){
-        if (this.id === "00"){
-            this.context.fillStyle = "#CE2331";
-            this.context.fillRect(Math.round(this.posX), Math.round(this.posY), this.width, this.height);
-
-            this.context.beginPath();
-            this.context.arc(Math.round(this.posX) + 30, Math.round(this.posY) + 10, 10, 3 * Math.PI / 2, Math.PI / 2);
-            this.context.fill()
-            
-            this.context.fillStyle = "#fff";
-            this.context.beginPath();
-            this.context.arc(Math.round(this.posX) + 30, Math.round(this.posY) + 10, 5, 3 * Math.PI / 2, Math.PI / 2);
-            this.context.fill();
+        if (this.id === this.globalID){
+              
+            let img = new Image()
+            img.src = './assets/coffee-skin.png';
+            this.context.drawImage(img, Math.round(this.posX), Math.round(this.posY))
 
 
         } else {
-            this.context.fillStyle = "#333333";
-            this.context.fillRect(Math.round(this.posX), Math.round(this.posY), this.width, this.height);
-
-            this.context.beginPath();
-            this.context.arc(Math.round(this.posX) + 30, Math.round(this.posY) + 10, 10, 3 * Math.PI / 2, Math.PI / 2);
-            this.context.fill()
-
-            this.context.fillStyle = "#fff";
-            this.context.beginPath();
-            this.context.arc(Math.round(this.posX) + 30, Math.round(this.posY) + 10, 5, 3 * Math.PI / 2, Math.PI / 2);
-            this.context.fill();
+            
+            let img = new Image()
+            img.src = './assets/coffee-skin-2.png';
+            this.context.drawImage(img, Math.round(this.posX), Math.round(this.posY))
 
         }
     }
     
     update(speedMoved){
-
-
-        if (this.id === '00') this.keyListen(speedMoved);
+        if (this.id === this.globalID) this.keyListen(speedMoved);
     }
 
     keyListen(speedMoved){
@@ -85,6 +74,7 @@ class Players extends PlayersObject{
     screenInfinite(x, y){
         return ((y % x) + x) % x
     }
+
 }
 
 class Sugar extends SugarObject {
@@ -98,7 +88,7 @@ class Sugar extends SugarObject {
 
     draw() {
         this.context.fillStyle = "#F2ED6F";
-        this.context.fillRect(Math.round(this.posX), Math.round(this.posY), 100, 100);        
+        this.context.fillRect(this.posX,this.posY, this.width, this.height);        
     }
 
     update(time) {
