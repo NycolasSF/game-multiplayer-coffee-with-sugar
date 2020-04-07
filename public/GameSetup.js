@@ -1,154 +1,193 @@
-class GameSetup { // create and loop in gmae
-    constructor(canvasId, idPlayer) {
-        this.canvas = null;
-        this.context = null;
+function GameSetup(canvasId) { // create and loop in gmae
+    let canvas = null;
+    let context = null;
 
-        this.idPlayer = idPlayer;
-        this.gamePlayers = {};
-        this.gameSugars = [];
+    let gamePlayers = {};
+    let gameSugars = [];
 
-        this.oldTimeStamp = 0;
+    let oldTimeStamp = 0;
 
-        this.canvasId = canvasId; 
-        this.startCanvas(this.canvasId);
-    }
+    let idPlayer = undefined;
 
-    startCanvas(canvasId) {
+    function prevUpdate(objectsGame) {
         console.info(">> Start game");
         
-        this.canvas = document.getElementById(canvasId);
-        this.context = this.canvas.getContext('2d');
+        canvas = document.getElementById(canvasId);
+        context = canvas.getContext('2d');
+        
+        addPlayers(objectsGame.gamePlayers);
+        addSugar(objectsGame.gameSugars);
 
-        this.createGame();
-
-        window.requestAnimationFrame((timeStamp) => { this.gameLoop(timeStamp) });
+        setInterval(()=>{
+            addSugarRandom()
+        }, 2000)        
+        
+        console.info(">> Start gameLoop");    
+        return window.requestAnimationFrame((timeStamp) => { gameLoop(timeStamp) });
     }
 
-    createGame() {
-        console.info(">> Create game");
+    function gameLoop(timeStamp) {
 
-        localStorage.setItem('globalID', this.idPlayer);
+        let secondsPassed = (timeStamp - oldTimeStamp) / 1000;
+        oldTimeStamp = timeStamp;
+
+        clearCanvas();  
+
+        playersScore();
+        
+        for (const idPlayer in gamePlayers){
+            const player = gamePlayers[idPlayer]; 
+            playerCollision(idPlayer)
+            player.update(secondsPassed);
+            player.draw();
+        }
+        
+        gameSugars.forEach((sugar) => {
+            sugar.update(secondsPassed);
+            sugar.draw();
+        });
+
+        window.requestAnimationFrame((timeStamp) => gameLoop(timeStamp));
+    }
+
+    // OBJ --> PLAYERS
+    function setPlayer(getIdPlayer) {
+        if (getIdPlayer) {
+            localStorage.setItem('globalID', getIdPlayer);
+            idPlayer = getIdPlayer;
+        }
+    }
+
+    function addPlayers(objectsPlayers) {
+        
+        for (const idPlayer in objectsPlayers) {
+            const player = objectsPlayers[idPlayer]
+            gamePlayers[idPlayer] = new Player(player, canvasId)
+        }
         
     }
 
-    gameLoop(timeStamp) {
-
-        let secondsPassed = (timeStamp - this.oldTimeStamp) / 1000;
-        this.oldTimeStamp = timeStamp;
-
-        let fps = Math.round(1 / secondsPassed);
-        document.getElementById('fps').innerHTML = `FPS: ${fps}`;
-
-        //end-script 
-        this.clearCanvas();
-
-        this.playerCollision();
-        for (const idPlayer in this.gamePlayers){
-           const player = this.gamePlayers[idPlayer];            
-           player.update(secondsPassed);
-           player.draw();
-           this.drawPoints(player)
-        }
-        
-        this.gameSugars.forEach((game) => {
-            game.update(secondsPassed);
-            game.draw();
-        });
-
-        window.requestAnimationFrame((timeStamp) => this.gameLoop(timeStamp));
-    }
-
-    // PLAYER
-    playerCollision(){
-
-        let player = this.gamePlayers[this.idPlayer];         
-
-        this.gameSugars.forEach((sugar) => {
-            sugar = { ... sugar,
-                x: Math.round(sugar.posX),
-                y: Math.round(sugar.posY),
-            }
-            
-            // let sugarX = this.context.isPointInPath()
-            if (player.posX < sugar.x + sugar.width &&
-                player.posX + player.width + 10 > sugar.x &&
-                player.posY < sugar.y + sugar.height &&
-                player.posY + player.height > sugar.y) {
-
-                player.score += 1;
-               
-                return this.removeSugar(sugar.id)
-            }
-
-        });
-    }
-
-    addPlayer(player) {
-        if(player){
-            this.gamePlayers[player.id] =  new Player(player, this.canvasId)
-        }
-    }    
-
-
-    removePlayer(idPlayer) {
-        if(idPlayer){
-            delete this.gamePlayers[idPlayer]
+    function removePlayer(idPlayer) {
+        console.log(`Player removed: ${gamePlayers[idPlayer].name}`);
+        if (idPlayer) {
+            delete gamePlayers[idPlayer]
         }
     }
 
-    drawPoints(player) {
-        let table = document.getElementById('points');
+    function playersScore() {
+        let points = document.getElementById('points');
+        let score = [];
 
-        table.innerHTML = ` 
+
+        points.innerHTML = `
             <tr>
-                <td>${player.name}</td>
-                <td>${player.score}</td>
+                <th>Nome</th>
+                <th>Pontos</th>
+            </tr>
+        `
+
+        for (const id in gamePlayers) {
+            const player = {
+                name: gamePlayers[id].name,
+                score: gamePlayers[id].score
+            }
+            score.push(player)
+        }
+
+        for (let i = 0; i < score.length; i++) {
+            points.innerHTML += `
+            <tr>
+                <td>${score[i].name}</td>
+                <td>${score[i].score}</td>
             </tr>
             `
+        }
 
     }
 
-
-    // SUGAR
-    addSugar(sugar) {
-        this.gameSugars.push(new Sugar(sugar, this.canvasId))
+    function playerCollision(getIdPlayer) {
+        
+        if (getIdPlayer === idPlayer){
+            let player = gamePlayers[getIdPlayer];
+    
+            gameSugars.forEach((sugar) => {
+                sugar = {
+                    ...sugar,
+                    x: Math.round(sugar.posX),
+                    y: Math.round(sugar.posY),
+                }
+    
+                if (player.posX < sugar.x + sugar.width &&
+                    player.posX + player.width + 10 > sugar.x &&
+                    player.posY < sugar.y + sugar.height &&
+                    player.posY + player.height > sugar.y) {
+    
+                    player.score += 1;
+                    
+                    return removeSugar(sugar.id)
+                }
+            });
+        }
+        return false;
     }
 
-    removeSugar(idSugar) {
+    // OBJ --> SUGARs
+    function addSugar(objectsSugar) {
+
+        for (const idSugar in objectsSugar) {
+            const sugar = objectsSugar[idSugar]
+            gameSugars.push(new Sugar(sugar, canvasId))
+        }
+
+    }
+
+    function removeSugar(idSugar) {
         if (idSugar) {
-            let find = this.gameSugars.findIndex(element => element.id === idSugar)
-            this.gameSugars.splice(find, 1);
+            let find = gameSugars.findIndex(element => element.id === idSugar)
+            gameSugars.splice(find, 1);
         }
     }
-    
-    addSugarRandom() {
-        if(this.gameSugars.length < 5){
+
+    function addSugarRandom() {
+        if (gameSugars.length < 5) {
             let numberRandom = Math.ceil(Math.random() * 640)
             let randomX = numberRandom <= 600 ? numberRandom : numberRandom / 2;
-            
-            console.log(`Add new sugar in x: ${randomX}`);
-            this.addSugar({
-                id: `${Math.ceil(Math.random() * 1024)}`,
+
+            // console.log(`Add new sugar in x: ${randomX}`);
+            gameSugars.push( new Sugar ({
+                id: `${Math.ceil(Math.random() * 600)}`,
                 position: {
                     x: randomX,
                     y: 0
                 },
                 tam: {
-                    x: 15,
-                    y: 15
+                    x: 24,
+                    y: 24
                 }
-            })
+            }, canvasId));
             return;
         }
-        console.log('Hit max sugars');
-        
+        // console.log('Hit max sugars');
+
         return 0;
     }
 
-
     //canvas
-    clearCanvas() {
-        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);        
+    function clearCanvas() {
+        context.clearRect(0, 0, canvas.width, canvas.height);        
+    }
+    return{
+        GameSetup,
+        prevUpdate,
+        playerCollision,
+        setPlayer,
+        addPlayers,
+        removePlayer,
+        addSugar,
+        removeSugar,
+        addSugarRandom,
+        clearCanvas
+
     }
 
 }

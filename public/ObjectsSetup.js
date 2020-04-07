@@ -36,7 +36,10 @@ class Player extends PlayerObject{
     }
     
     update(speedMoved){
-        if (this.id === this.globalID) this.keyListen(speedMoved);
+        
+        if (this.id === this.globalID){
+            this.keyListen(speedMoved);    
+        } 
     }
 
     keyListen(speedMoved){
@@ -70,29 +73,32 @@ class Player extends PlayerObject{
             mod = 0;
         } 
     }
-
     screenInfinite(x, y){
         return ((y % x) + x) % x
     }
 
+
 }
 
 class Sugar extends SugarObject {
-    constructor(sugar, canvasID){
+    constructor(sugar, canvasID) {
 
         //View GameObjets.js
         super(sugar, canvasID);
 
-        this.speed = 64;
+        this.speed = 76;
     }
 
     draw() {
-        this.context.fillStyle = "#F2ED6F";
-        this.context.fillRect(this.posX,this.posY, this.width, this.height);        
+        let img = new Image()
+        img.src = './assets/sugar.png';
+        this.context.drawImage(img, Math.round(this.posX), Math.round(this.posY))
     }
 
     update(time) {
         let calc = this.posY + (time * this.speed);
         this.posY = calc < this.screen.h ? calc : 0;
     }
+
+
 }

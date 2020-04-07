@@ -1,0 +1,66 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Coffe with sugar</title>
+        <link rel="stylesheet" href="./style.css">
+        <script src="/socket.io/socket.io.js"></script>
+    </head>
+    <body>
+        <div  id="start" class="container-start">
+            <h2>Coffe with sugar</h2>
+            <form>
+                <input type="text" id="apelido" placeholder="Digite seu Nick"/>
+                <button onclick="emitGame()" type="button">Start</button>
+            </form>
+        </div>
+        <section id="game" class="container-game">
+            <h2>Coffe with sugar</h2>
+            <div class="content-screenRender">
+                <canvas id="screenRender" width="640" height="260">
+                    Canvas requires a browser that supports HTML5.
+                </canvas>
+                <div class="table">
+                    <table id="points" class="table-points"></table>
+                </div>
+            </div>
+        </section>
+    </body>
+    <script src="./GameObjects.js"></script>
+    <script src="./ObjectsSetup.js"></script>
+    <script src="./GameSetup.js"></script>
+    <script > 
+        const socket = io();
+        const game = GameSetup('screenRender');
+
+        function emitGame(){
+            let playerName = document.getElementById('apelido').value;
+            
+            if (playerName){        
+                socket.emit('start-game', playerName);
+                
+            }else{
+
+                alert('Digite seu nome!') 
+            }
+        }
+        socket.on('add-player', ({getGame, idPlayer})=>{
+        
+            game.setPlayer(idPlayer);
+            game.prevUpdate(getGame);
+
+            document.getElementById('start').style.display = 'none'; 
+            document.getElementById('game').style.display = 'block'; 
+        
+        });
+
+         socket.on('new-player', ({ getGame }) => {
+            console.log(getGame);
+            
+
+            game.prevUpdate(getGame);
+        })
+        
+
+    </script>
+</html>
