@@ -2,12 +2,13 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="shortcut icon" href="./assets/favicon.png" type="image/png">
         <title>Coffe with sugar</title>
         <link rel="stylesheet" href="./style.css">
         <script src="/socket.io/socket.io.js"></script>
     </head>
     <body>
-        <div  id="start" class="container-start">
+        <div id="start" class="container-start">
             <h2>Coffe with sugar</h2>
             <form>
                 <input type="text" id="apelido" placeholder="Digite seu Nick"/>
@@ -34,15 +35,13 @@
         const game = GameSetup('screenRender');
 
         function emitGame(){
-            let playerName = document.getElementById('apelido').value;
+            let playerName = document.getElementById('apelido').value != '' ? 
+            document.getElementById('apelido').value : alert('Empty coffee');
             
-            if (playerName){        
-                socket.emit('start-game', playerName);
-                
-            }else{
-
-                alert('Digite seu nome!') 
+            if(playerName != undefined){
+                return socket.emit('start-game', playerName);
             }
+            
         }
         socket.on('add-player', ({getGame, idPlayer})=>{
         
@@ -53,13 +52,21 @@
             document.getElementById('game').style.display = 'block'; 
         
         });
-
          socket.on('new-player', ({ getGame }) => {
-            console.log(getGame);
-            
-
             game.prevUpdate(getGame);
-        })
+        });
+        socket.on('remove-player', (idPlayer)=>{
+            game.removePlayer(idPlayer);
+        });
+
+
+        socket.on('add-sugar', (sugar)=>{
+            game.addSugar(sugar);
+        });
+        
+
+        
+        
         
 
     </script>

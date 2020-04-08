@@ -15,12 +15,9 @@ function GameSetup(canvasId) { // create and loop in gmae
         canvas = document.getElementById(canvasId);
         context = canvas.getContext('2d');
         
-        addPlayers(objectsGame.gamePlayers);
-        addSugar(objectsGame.gameSugars);
-
-        setInterval(()=>{
-            addSugarRandom()
-        }, 2000)        
+        addPlayers(objectsGame.player);
+        addSugars(objectsGame.sugar);
+        
         
         console.info(">> Start gameLoop");    
         return window.requestAnimationFrame((timeStamp) => { gameLoop(timeStamp) });
@@ -38,19 +35,19 @@ function GameSetup(canvasId) { // create and loop in gmae
         for (const idPlayer in gamePlayers){
             const player = gamePlayers[idPlayer]; 
             playerCollision(idPlayer)
-            player.update(secondsPassed);
+            player.update(0.02);
             player.draw();
         }
         
         gameSugars.forEach((sugar) => {
-            sugar.update(secondsPassed);
-            sugar.draw();
+            sugar.update(0.02);
+            sugar.draw(secondsPassed);
         });
 
         window.requestAnimationFrame((timeStamp) => gameLoop(timeStamp));
     }
 
-    // OBJ --> PLAYERS
+    // ? OBJ --> PLAYERS
     function setPlayer(getIdPlayer) {
         if (getIdPlayer) {
             localStorage.setItem('globalID', getIdPlayer);
@@ -81,8 +78,8 @@ function GameSetup(canvasId) { // create and loop in gmae
 
         points.innerHTML = `
             <tr>
-                <th>Nome</th>
-                <th>Pontos</th>
+                <th>Players</th>
+                <th>Points</th>
             </tr>
         `
 
@@ -106,7 +103,6 @@ function GameSetup(canvasId) { // create and loop in gmae
     }
 
     function playerCollision(getIdPlayer) {
-        
         if (getIdPlayer === idPlayer){
             let player = gamePlayers[getIdPlayer];
     
@@ -121,7 +117,7 @@ function GameSetup(canvasId) { // create and loop in gmae
                     player.posX + player.width + 10 > sugar.x &&
                     player.posY < sugar.y + sugar.height &&
                     player.posY + player.height > sugar.y) {
-    
+                        
                     player.score += 1;
                     
                     return removeSugar(sugar.id)
@@ -131,14 +127,20 @@ function GameSetup(canvasId) { // create and loop in gmae
         return false;
     }
 
-    // OBJ --> SUGARs
-    function addSugar(objectsSugar) {
+    // ? OBJ --> SUGARs
 
-        for (const idSugar in objectsSugar) {
-            const sugar = objectsSugar[idSugar]
+    function addSugars(objectsSugars) { // * Add all sugars 
+        console.log(`Added sugars ${objectsSugars}`);
+        
+        for (const idSugar in objectsSugars) {
+            const sugar = objectsSugars[idSugar]
             gameSugars.push(new Sugar(sugar, canvasId))
         }
-
+    }
+    function addSugar(sugar) {
+        if(sugar.id){
+            gameSugars.push(new Sugar(sugar, canvasId))
+        }
     }
 
     function removeSugar(idSugar) {
@@ -147,35 +149,11 @@ function GameSetup(canvasId) { // create and loop in gmae
             gameSugars.splice(find, 1);
         }
     }
-
-    function addSugarRandom() {
-        if (gameSugars.length < 5) {
-            let numberRandom = Math.ceil(Math.random() * 640)
-            let randomX = numberRandom <= 600 ? numberRandom : numberRandom / 2;
-
-            // console.log(`Add new sugar in x: ${randomX}`);
-            gameSugars.push( new Sugar ({
-                id: `${Math.ceil(Math.random() * 600)}`,
-                position: {
-                    x: randomX,
-                    y: 0
-                },
-                tam: {
-                    x: 24,
-                    y: 24
-                }
-            }, canvasId));
-            return;
-        }
-        // console.log('Hit max sugars');
-
-        return 0;
-    }
-
-    //canvas
+    
     function clearCanvas() {
         context.clearRect(0, 0, canvas.width, canvas.height);        
     }
+
     return{
         GameSetup,
         prevUpdate,
@@ -184,8 +162,8 @@ function GameSetup(canvasId) { // create and loop in gmae
         addPlayers,
         removePlayer,
         addSugar,
+        addSugars,
         removeSugar,
-        addSugarRandom,
         clearCanvas
 
     }

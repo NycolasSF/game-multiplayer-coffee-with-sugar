@@ -100,5 +100,4 @@ class Sugar extends SugarObject {
         this.posY = calc < this.screen.h ? calc : 0;
     }
 
-
 }

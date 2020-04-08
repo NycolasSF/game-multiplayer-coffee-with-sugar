@@ -17,24 +17,53 @@ const game = new CreateConfig();
 
 io.on("connection", (socket)=> {
   console.log("Player connected :", socket.id);
+
   socket.on('start-game', (namePlayer)=>{
-    game.addPlayer(namePlayer, socket);
-    game.addSugar();
-    socket.emit('add-player', {getGame: game, idPlayer: socket.id})    
-    socket.broadcast.emit('new-player', { getGame: game })
+
+    game.addPlayer(namePlayer, socket.id);
+
+    socket.emit('add-player', { 
+      getGame: {
+        player: game.gamePlayers,
+        sugar: game.gameSugars
+      }, 
+      idPlayer: socket.id
+    });
+
+    socket.broadcast.emit('new-player', { getGame: game });
+    
+    // ? SUGARs
+    setInterval(() => {
+      let addRandom = game.addSugarRandom();
+      if (addRandom) return socket.emit('add-sugar', addRandom);
+    }, 2500);
+
   });
 
+
+  socket.on('removed-sugar', (idSugar)=>{
+    game.removeSugar(idSugar);
+  });
+
+
+
   socket.on("disconnect", ()=> {
+
+    console.log("\n \n ");
     console.log("Player disconnected: ", socket.id);
+    console.log("Object Players: ", game.gamePlayers);
+    console.log("Object Sugars: ", game.gameSugars);
+    console.log("\n \n ");
+
     game.removePlayer(socket.id);
-    console.log("Game: ", game.gamePlayers);
     io.emit("remove-player", socket.id);
+
   });
 });
 
 
 setInterval(() => {
-  io.emit('concurrent-connections', io.engine.clientsCount)
+  io.emit('players-connected', io.engine.clientsCount)
 }, 5000)
 
 

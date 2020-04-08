@@ -3,6 +3,7 @@ class PlayerObject {
         
         this.id = player.id;
         this.name = player.name; 
+        this.score = player.score;
         this.posX = player.position.x;
         this.posY = player.position.y;
         this.width = player.tam.x;
@@ -11,7 +12,6 @@ class PlayerObject {
         this.context = null;
         this.screen = {};
 
-        this.score = 0;
         
         this.setAttributes(canvasId);
     }
