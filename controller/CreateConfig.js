@@ -3,8 +3,10 @@ module.exports = class CreateConfig {
     constructor(){
         this.gamePlayers = {}
         this.gameSugars = [];
+        this.timeSugars = 1;
     }
     
+    // ? PLAYERs
     addPlayer(namePlayer, socketId) {
     
         console.log(`Player added: ${namePlayer}`);
@@ -27,24 +29,78 @@ module.exports = class CreateConfig {
     removePlayer(idPlayer){
         delete this.gamePlayers[idPlayer];
     }
-            
-    
 
+    movePlayer(id, key) {
+        let player  = this.gamePlayers[id];
+        const movedTamX = 10; // ! view GameSetup.js playerCheckCollision
+        const movedTamY = 20;// ! view GameSetup.js movePlayer
+
+        if (key === 'ArrowUp') {
+            if(player.position.y > 210){
+
+                player.position.y -= movedTamY;
+                setTimeout(() => {
+                    player.position.y += movedTamY;
+                    
+                }, 100);
+                
+                return {
+                    x: null,
+                    y: player.position.y
+                };
+
+            }else{
+                return {
+                    x: null,
+                    y: player.position.y
+                };
+            
+            }
+        }
+
+        if (key === 'ArrowLeft') {
+            player.position.x -= movedTamX;
+            
+            return {
+                x: player.position.x,
+                y: null
+            };
+        }
+
+        if (key === 'ArrowRight') {
+            player.position.x += movedTamX;
+
+            return {
+                x: player.position.x,
+                y: null
+            };
+        }
+
+    }
+    
+    updateScorePlayer(idPlayer){
+        this.gamePlayers[idPlayer].score += 1;
+    }
+
+    // ? SUGARs
     addSugar(numberRandom) {
 
-        let randomX = numberRandom <= 640 ? numberRandom : numberRandom / 2;
-
         let dados = {
-            id: `${Math.ceil(Math.random() * 1024)}`,
+            id: `${Math.ceil(Math.random() * 2048)}`,
             position: {
-                x: randomX,
+                x: numberRandom,
                 y: 0
             },
             tam: {
                 x: 24,
                 y: 24
-            }
+            },
+            timeSugar: this.timeSugars
         }
+        
+        
+        console.log(`Time Sugars: ${this.timeSugars}`);
+        this.timeSugars === 1 ? this.timeSugars = 0.1 : this.timeSugars += 0.25;
         
         this.gameSugars.push(dados);
         console.log(`Sugar: ${this.gameSugars.length}`);
@@ -54,31 +110,35 @@ module.exports = class CreateConfig {
 
     removeSugar(idSugar){
         if (idSugar) {
-            let find = gameSugars.findIndex(element => element.id === idSugar)
-            gameSugars.splice(find, 1);
+            let find = this.gameSugars.findIndex(element => element.id === idSugar)
+            this.gameSugars.splice(find, 1);
         }
     }
 
     addSugarRandom(){
         if (this.gameSugars.length <= 5){            
 
-            let numberRandom = Math.ceil(Math.random() * 800);
-
-            if(this.gameSugars.length != 0) {
-
-                return this.addSugar(numberRandom);
-
-            }else{
+            let numberRandom = Math.ceil(Math.random() * 700);
+            
+            if(this.gamePlayers.length > 0){
                 this.gameSugars.forEach((sugar)=>{
 
-                    if (sugar.position.x + sugar.tam.x === numberRandom + sugar.tam.x ){
-                        console.log('Sugar in gameSugars');
-                        numberRandom = numberRandom * Math.ceil(Math.random() * 5);
-                    }
+                    if (sugar.position.x < numberRandom + sugar.tam.x &&
+                        sugar.position.x + sugar.tam.x > numberRandom) {
+                            
+                            let newRandom = Math.ceil(Math.random() * (numberRandom + sugar.tam.x));
+                            console.log(`New Sugar \n New Random ${newRandom}`);
+                            return this.addSugar(newRandom);
+                        
+                        }else{
+
+                            return this.addSugar(numberRandom);
+
+                        }
 
                 });
+            }else{
                 return this.addSugar(numberRandom);
-                
             }
         }
         return false;

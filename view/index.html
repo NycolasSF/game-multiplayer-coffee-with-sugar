@@ -12,7 +12,7 @@
             <h2>Coffe with sugar</h2>
             <form>
                 <input type="text" id="apelido" placeholder="Digite seu Nick"/>
-                <button onclick="emitGame()" type="button">Start</button>
+                <button onclick="emitStartGame()" type="button">Start</button>
             </form>
         </div>
         <section id="game" class="container-game">
@@ -34,7 +34,7 @@
         const socket = io();
         const game = GameSetup('screenRender');
 
-        function emitGame(){
+        function emitStartGame(){
             let playerName = document.getElementById('apelido').value != '' ? 
             document.getElementById('apelido').value : alert('Empty coffee');
             
@@ -43,31 +43,64 @@
             }
             
         }
+
         socket.on('add-player', ({getGame, idPlayer})=>{
-        
+            
             game.setPlayer(idPlayer);
-            game.prevUpdate(getGame);
+            game.start(getGame);
+
+            // ? START DETECT COLLISION
+            setInterval(() => {
+                let detectCollision = game.playerCheckCollision(idPlayer);
+                console.log(detectCollision.collision);
+                                
+                if (detectCollision.collision) return socket.emit('check-player', detectCollision);
+            }, 200)
 
             document.getElementById('start').style.display = 'none'; 
             document.getElementById('game').style.display = 'block'; 
         
         });
-         socket.on('new-player', ({ getGame }) => {
-            game.prevUpdate(getGame);
+
+        //  ? PLAYERs
+        socket.on('new-player', ({player}) => {
+            game.addPlayer(player)             
         });
+
         socket.on('remove-player', (idPlayer)=>{
             game.removePlayer(idPlayer);
         });
 
+        socket.on('player-update', (player)=>{ // ? My player
+            game.movePlayer(player);
+        }); 
+        socket.on('players-update', (player) => { // ? Others players
+            game.movePlayer(player);
+        });
+        socket.on('player-colided', (obj)=>{// ? My player
+            game.playerColided(obj);
+        });
+        socket.on('player-colided-update', (obj)=>{// ? Others players
+            game.playerColided(obj);
+        });
 
-        socket.on('add-sugar', (sugar)=>{
+
+
+        // ? SUGARs
+        socket.on('add-sugar', (sugar) => {
             game.addSugar(sugar);
         });
         
+    
+        
 
+        document.addEventListener("keydown", emitKeybordListen);
         
-        
-        
+        function emitKeybordListen(e){  
+            if(e.key != undefined && e.key === 'ArrowUp' || e.key === 'ArrowLeft' || e.key == 'ArrowRight'){
+                socket.emit('key-listen', { id: game.getPlayer(), key: e.key });
+            }
+        }
 
     </script>
 </html>

@@ -9,14 +9,14 @@ function GameSetup(canvasId) { // create and loop in gmae
 
     let idPlayer = undefined;
 
-    function prevUpdate(objectsGame) {
+    function start(getGame) {
         console.info(">> Start game");
         
         canvas = document.getElementById(canvasId);
         context = canvas.getContext('2d');
         
-        addPlayers(objectsGame.player);
-        addSugars(objectsGame.sugar);
+        addPlayers(getGame.player);
+        addSugars(getGame.sugar);
         
         
         console.info(">> Start gameLoop");    
@@ -25,23 +25,22 @@ function GameSetup(canvasId) { // create and loop in gmae
 
     function gameLoop(timeStamp) {
 
-        let secondsPassed = (timeStamp - oldTimeStamp) / 1000;
+        let time = (timeStamp - oldTimeStamp) / 1000;
         oldTimeStamp = timeStamp;
 
         clearCanvas();  
 
         playersScore();
-        
+
         for (const idPlayer in gamePlayers){
             const player = gamePlayers[idPlayer]; 
-            playerCollision(idPlayer)
-            player.update(0.02);
             player.draw();
         }
-        
+       
+            
         gameSugars.forEach((sugar) => {
-            sugar.update(0.02);
-            sugar.draw(secondsPassed);
+            sugar.update(time);
+            sugar.draw();
         });
 
         window.requestAnimationFrame((timeStamp) => gameLoop(timeStamp));
@@ -54,21 +53,77 @@ function GameSetup(canvasId) { // create and loop in gmae
             idPlayer = getIdPlayer;
         }
     }
+    function getPlayer() {
+       return idPlayer;
+    }
 
-    function addPlayers(objectsPlayers) {
-        
+    function addPlayers(objectsPlayers) {   
         for (const idPlayer in objectsPlayers) {
             const player = objectsPlayers[idPlayer]
             gamePlayers[idPlayer] = new Player(player, canvasId)
         }
-        
+    }
+
+    function addPlayer(player) {
+       gamePlayers[player.id] = new Player(player, canvasId);
     }
 
     function removePlayer(idPlayer) {
-        console.log(`Player removed: ${gamePlayers[idPlayer].name}`);
         if (idPlayer) {
             delete gamePlayers[idPlayer]
         }
+    }
+
+    function movePlayer({ id, playerMoved}) {
+        
+        if(playerMoved.x != null){
+            gamePlayers[id].posX = playerMoved.x;
+        }else{
+            gamePlayers[id].posY = playerMoved.y;
+            setTimeout(()=>{
+                gamePlayers[id].posY = playerMoved.y + 20;
+            }, 150);
+        }
+
+    }
+
+    function playerCheckCollision(getIdPlayer) {
+        let colided = {
+            collision: false
+        };
+
+        if (getIdPlayer === idPlayer){
+            
+            let player = gamePlayers[getIdPlayer];
+    
+            gameSugars.forEach((sugar) => {
+                sugar = {
+                    ...sugar,
+                    x: Math.round(sugar.posX),
+                    y: Math.round(sugar.posY),
+                }
+
+    
+                if (player.posX < sugar.x + sugar.width &&
+                    player.posX + player.width + 10 > sugar.x &&
+                    player.posY < sugar.y + sugar.height &&
+                    player.posY + player.height > sugar.y) {
+                        
+                    console.log(`COLIDED sugar: ${ sugar.id } and player ${ player.id }`);
+                    return colided = {
+                        collision: true,
+                        idSugar: sugar.id,
+                        idPlayer: getIdPlayer
+                    }
+                }
+            });
+        }
+        return colided;
+    }
+
+    function playerColided({colidedIdPlayer, colidedIdSugar}){
+        gamePlayers[colidedIdPlayer].score += 1;
+        removeSugar(colidedIdSugar);
     }
 
     function playersScore() {
@@ -102,44 +157,19 @@ function GameSetup(canvasId) { // create and loop in gmae
 
     }
 
-    function playerCollision(getIdPlayer) {
-        if (getIdPlayer === idPlayer){
-            let player = gamePlayers[getIdPlayer];
-    
-            gameSugars.forEach((sugar) => {
-                sugar = {
-                    ...sugar,
-                    x: Math.round(sugar.posX),
-                    y: Math.round(sugar.posY),
-                }
-    
-                if (player.posX < sugar.x + sugar.width &&
-                    player.posX + player.width + 10 > sugar.x &&
-                    player.posY < sugar.y + sugar.height &&
-                    player.posY + player.height > sugar.y) {
-                        
-                    player.score += 1;
-                    
-                    return removeSugar(sugar.id)
-                }
-            });
-        }
-        return false;
-    }
-
     // ? OBJ --> SUGARs
-
-    function addSugars(objectsSugars) { // * Add all sugars 
-        console.log(`Added sugars ${objectsSugars}`);
-        
-        for (const idSugar in objectsSugars) {
-            const sugar = objectsSugars[idSugar]
-            gameSugars.push(new Sugar(sugar, canvasId))
-        }
-    }
     function addSugar(sugar) {
         if(sugar.id){
             gameSugars.push(new Sugar(sugar, canvasId))
+        }
+    }
+
+    function addSugars(objectsSugars) {
+        if(objectsSugars){
+            for (const idSugar in objectsSugars) {
+                const sugar = objectsSugars[idSugar]
+                gameSugars.push(new Sugar(sugar, canvasId));
+            }
         }
     }
 
@@ -156,11 +186,15 @@ function GameSetup(canvasId) { // create and loop in gmae
 
     return{
         GameSetup,
-        prevUpdate,
-        playerCollision,
+        start,
         setPlayer,
+        getPlayer,
+        addPlayer,
         addPlayers,
         removePlayer,
+        playerCheckCollision,
+        playerColided,
+        movePlayer,
         addSugar,
         addSugars,
         removeSugar,

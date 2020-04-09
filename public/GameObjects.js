@@ -31,6 +31,7 @@ class SugarObject {
         this.posY = sugar.position.y;
         this.width = sugar.tam.x;
         this.height = sugar.tam.y;
+        this.timeSugar = sugar.timeSugar
         
         this.context = null;
         this.screen = {};

@@ -9,74 +9,34 @@ class Player extends PlayerObject{
             ArrowRight: false
         }
 
-        this.speed = 256;
 
         this.globalID = undefined;
         this.getElements();
     }
+
     getElements(){
         this.globalID = localStorage.getItem('globalID');
     }
     
     draw(){
-        if (this.id === this.globalID){
-              
-            let img = new Image()
+
+        let img = new Image()
+
+        if (this.id === this.globalID){      
             img.src = './assets/coffee-skin.png';
-            this.context.drawImage(img, Math.round(this.posX), Math.round(this.posY))
-
-
         } else {
-            
-            let img = new Image()
             img.src = './assets/coffee-skin-2.png';
-            this.context.drawImage(img, Math.round(this.posX), Math.round(this.posY))
-
-        }
-    }
-    
-    update(speedMoved){
-        
-        if (this.id === this.globalID){
-            this.keyListen(speedMoved);    
-        } 
-    }
-
-    keyListen(speedMoved){
-        document.addEventListener("keydown", (event) => {
-            return this.keys[event.key] = true
-        });
-        document.addEventListener("keyup", (event) => {
-            return this.keys[event.key] = false
-        });
-        
-        this.movePlayer(speedMoved);
-    }
-
-    movePlayer(speedMoved){
-
-        if (this.keys.ArrowUp) {
-            this.posY -= this.speed * speedMoved;
-            setTimeout(() => {
-                this.posY += this.speed * speedMoved;
-            }, 100)
         }
 
-        if (this.keys.ArrowLeft) {
-            let mod = this.posX - (this.speed * speedMoved);
-            this.posX = this.screenInfinite(this.screen.w, mod)
-            mod = 0;
-        }
-        if (this.keys.ArrowRight) {
-            let mod = this.posX + (this.speed * speedMoved)
-            this.posX = this.screenInfinite(this.screen.w, mod);
-            mod = 0;
-        } 
+        let moveX = this.screenInfinite(this.screen.w, Math.round(this.posX));
+
+        this.context.drawImage(img, moveX, Math.round(this.posY))
     }
-    screenInfinite(x, y){
+
+
+    screenInfinite(x, y) {
         return ((y % x) + x) % x
     }
-
 
 }
 
@@ -92,12 +52,18 @@ class Sugar extends SugarObject {
     draw() {
         let img = new Image()
         img.src = './assets/sugar.png';
-        this.context.drawImage(img, Math.round(this.posX), Math.round(this.posY))
+
+        let moveX = this.screenInfinite(this.screen.w, Math.round(this.posX));
+        this.context.drawImage(img, moveX, Math.round(this.posY))
+    }
+
+    screenInfinite(x, y) {
+        return ((y % x) + x) % x
     }
 
     update(time) {
         let calc = this.posY + (time * this.speed);
-        this.posY = calc < this.screen.h ? calc : 0;
+        this.posY = calc < this.screen.h ? calc + this.timeSugar : 0;
     }
 
 }
