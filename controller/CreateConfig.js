@@ -99,19 +99,19 @@ module.exports = class CreateConfig {
         }
         
         
-        console.log(`Time Sugars: ${this.timeSugars}`);
-        this.timeSugars === 1 ? this.timeSugars = 0.1 : this.timeSugars += 0.25;
+        this.timeSugars === 1 ? this.timeSugars = 0.25 : this.timeSugars += 0.25;
         
+        console.log(`QTD Sugar: ${this.gameSugars.length}`);
         this.gameSugars.push(dados);
-        console.log(`Sugar: ${this.gameSugars.length}`);
         
         return dados;
     }
 
     removeSugar(idSugar){
+        console.log(`SUGAR REMOVED: ${idSugar} `);
         if (idSugar) {
-            let find = this.gameSugars.findIndex(element => element.id === idSugar)
-            this.gameSugars.splice(find, 1);
+            let find = this.gameSugars.findIndex(element => element.id === idSugar);
+            this.gameSugars.splice(find, 1);            
         }
     }
 
@@ -141,6 +141,8 @@ module.exports = class CreateConfig {
                 return this.addSugar(numberRandom);
             }
         }
+        console.log(`Hit max sugars`);
+        
         return false;
     }
 

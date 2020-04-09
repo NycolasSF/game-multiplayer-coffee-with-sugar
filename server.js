@@ -29,34 +29,33 @@ io.on("connection", (socket)=> {
         sugar: game.gameSugars
       }, 
       idPlayer: socket.id
-    });
-    
+    });  
+
     // ? Sugar random
-    setInterval(() => {
-      let sugarRandom = game.addSugarRandom();
-      socket.emit('add-sugar', sugarRandom);
-    }, 2000);    
+    let sugarRandom = setInterval(() => {
+      io.emit('add-sugar', game.addSugarRandom());
+    }, 2500);  
 
     //  ? Emit new player
     socket.broadcast.emit('new-player', { player: game.gamePlayers[socket.id]});
-
   });
 
   // ? PLAYER(s)
   socket.on('key-listen', ({id, key})=>{
-    let moved = game.movePlayer(id, key) 
+    let moved = game.movePlayer(id, key);
+
     socket.emit('player-update', { id: id, playerMoved: moved});
-    socket.broadcast.emit('players-update', { id: id, playerMoved: moved });
+    socket.broadcast.emit('player-update', { id: id, playerMoved: moved });
   });
 
-  socket.on('check-player', ({idPlayer, idSugar})=>{
+  socket.on('player-collision', ({idPlayer, idSugar})=>{
     console.log(`Player colided ${idPlayer} with ${idSugar}`);
     
     game.updateScorePlayer(idPlayer);
     game.removeSugar(idSugar);
 
     socket.emit('player-colided', { colidedIdPlayer: idPlayer, colidedIdSugar: idSugar});
-    socket.broadcast.emit('player-collided-update', { colidedIdPlayer: idPlayer, colidedIdSugar: idSugar })
+    socket.broadcast.emit('player-colided', { colidedIdPlayer: idPlayer, colidedIdSugar: idSugar, type: 'broadcast' });
 
   });
 
@@ -72,8 +71,6 @@ io.on("connection", (socket)=> {
 
     console.log("\n \n ");
     console.log("Player disconnected: ", socket.id);
-    console.log("Object Players: ", game.gamePlayers);
-    console.log("Object Sugars: ", game.gameSugars);
     console.log("\n \n ");
 
     game.removePlayer(socket.id);

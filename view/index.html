@@ -52,10 +52,8 @@
             // ? START DETECT COLLISION
             setInterval(() => {
                 let detectCollision = game.playerCheckCollision(idPlayer);
-                console.log(detectCollision.collision);
-                                
-                if (detectCollision.collision) return socket.emit('check-player', detectCollision);
-            }, 200)
+                if (detectCollision.collision) return socket.emit('player-collision', detectCollision);
+            }, 100);
 
             document.getElementById('start').style.display = 'none'; 
             document.getElementById('game').style.display = 'block'; 
@@ -71,16 +69,12 @@
             game.removePlayer(idPlayer);
         });
 
-        socket.on('player-update', (player)=>{ // ? My player
+        socket.on('player-update', (player)=>{
             game.movePlayer(player);
         }); 
-        socket.on('players-update', (player) => { // ? Others players
-            game.movePlayer(player);
-        });
-        socket.on('player-colided', (obj)=>{// ? My player
-            game.playerColided(obj);
-        });
-        socket.on('player-colided-update', (obj)=>{// ? Others players
+        socket.on('player-colided', (obj)=>{
+            console.log(`Type: ${obj.type}`);
+            
             game.playerColided(obj);
         });
 

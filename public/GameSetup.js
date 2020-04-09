@@ -159,7 +159,9 @@ function GameSetup(canvasId) { // create and loop in gmae
 
     // ? OBJ --> SUGARs
     function addSugar(sugar) {
-        if(sugar.id){
+        console.log(`QTD SUGAR: ${gameSugars.length} `);
+        
+        if(sugar.id && gameSugars.length <= 5){
             gameSugars.push(new Sugar(sugar, canvasId))
         }
     }
@@ -175,6 +177,8 @@ function GameSetup(canvasId) { // create and loop in gmae
 
     function removeSugar(idSugar) {
         if (idSugar) {
+            console.log(`SUGAR REMOVED: ${idSugar}`);
+            
             let find = gameSugars.findIndex(element => element.id === idSugar)
             gameSugars.splice(find, 1);
         }
@@ -186,6 +190,7 @@ function GameSetup(canvasId) { // create and loop in gmae
 
     return{
         GameSetup,
+        gameSugars,
         start,
         setPlayer,
         getPlayer,
