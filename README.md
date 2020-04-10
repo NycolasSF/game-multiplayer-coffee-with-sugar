@@ -18,6 +18,26 @@ O princípio deu-se no fim da *Playlist*, onde pensei --> "Tá faltando açúcar
 A ideia do jogo é perfeitamente moldada para a simplicidade, tem açúcar caindo do "céu" e você é a 
 xícara, caneca - você decide - que irá pegar os doçes açúcares que fazem seu *Score* aumentar. 
 
+## Com seu café em mãos >> Bora Testar
+
+Para testar você precisará do [**Node.js**](https://nodejs.org/en/download/) instalado em seu computador, com ele instalado entre no diretório/pasta e execute:
+
+> npm install
+
+e depois:
+
+> npx nodemon
+
+caso não consiga executar com npx nodemon tente:
+
+>node server.js
+
+Executando os comandos acima deve aparecer:
+> Connected in port 3001
+
+agora é só abrir o navegador e --> **Seja Feliz**
+
+
 ## Considerações Finais
 
 O joga está finalizado e rodando muito bem quando, iniciamos dois ou mais jogadores ao mesmo tempo. Caso, os jogadores entre em tempo diferentes pode haver uma avaria em alguns casos nos açúcares. 
