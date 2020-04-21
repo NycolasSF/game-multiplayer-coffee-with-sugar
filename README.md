@@ -47,4 +47,4 @@ Mesmo com sua finalização, a experiência ganha e a sensação de ver funciona
 ## Autor
 | [<img src="https://avatars3.githubusercontent.com/u/31997816?s=460&u=107452a7dfa9ec91a46f6fe7abced2ce57c6b2ce&v=4" width=115><br><sub>@NycolasSF</sub>](https://github.com/NycolasSF) |
 | :---: |
-:--> Até +_+ Vê <--:
+--> Até +_+ Vê <--
